@@ -85,7 +85,7 @@ Returns the hash of detected applications by categorie:
 
     (
         cms  => [ 'Joomla' ],
-        javascript-frameworks => [ 'jQuery', 'jQuery UI' ],
+        'javascript-frameworks' => [ 'jQuery', 'jQuery UI' ],
     )
 
 =cut
