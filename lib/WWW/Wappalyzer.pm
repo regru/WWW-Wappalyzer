@@ -20,27 +20,26 @@ my %MULTIPLE_APP_CATS = map { $_ => 1 } qw(
 
 =head1 NAME
 
-WWW::Wappalyzer
+WWW::Wappalyzer - Perl port of Wappalyzer (L<http://wappalyzer.com>)
 
 =head1 DESCRIPTION
 
-Perl port of Wappalyzer (http://wappalyzer.com). Uncovers the technologies used on websites:
-detects content management systems, web shops, web servers, JavaScript frameworks, 
-analytics tools and many more.
+Uncovers the technologies used on websites: detects content management systems, web shops,
+web servers, JavaScript frameworks, analytics tools and many more.
 
 Lacks 'version' and 'confidence' support of original Wappalyzer in favour of speed.
 
-Clues:      https://github.com/ElbertF/Wappalyzer/blob/master/share/apps.json
+Clues:      L<https://github.com/ElbertF/Wappalyzer/blob/master/share/apps.json>
 
-More info:  https://github.com/ElbertF/Wappalyzer/blob/master/README.md
+More info:  L<https://github.com/ElbertF/Wappalyzer/blob/master/README.md>
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 
 =head1 SYNOPSIS
@@ -68,11 +67,14 @@ None by default.
 
 =head1 SUBROUTINES/METHODS
 
-=head2 %detected = detect( %params )
+=head2 detect
+
+    my %detected = detect( %params )
 
 Tries to detect CMS, framework, etc for given html code, http headers, url.
 
 Available parameters:
+
     html    - html code of web page
     headers - hash ref to http headers list
     url     - url of web page
@@ -80,10 +82,12 @@ Available parameters:
               less cats => less cpu usage
 
 Returns the hash of detected applications by categorie:
-(
-    cms  => [ 'Joomla' ],
-    javascript-frameworks => [ 'jQuery', 'jQuery UI' ],
-)
+
+    (
+        cms  => [ 'Joomla' ],
+        javascript-frameworks => [ 'jQuery', 'jQuery UI' ],
+    )
+
 =cut
 
 sub detect {
@@ -94,7 +98,7 @@ sub detect {
     # Lazy load and process clues from JSON file
     _load_categories() unless scalar keys %_categories;
 
-    my @cats = $params{cats} && ( ref( $params{cats} ) // '' ) eq 'ARRAY'
+    my @cats = $params{cats} && ( ref( $params{cats} ) || '' ) eq 'ARRAY'
         ? @{ $params{cats} } : get_categories();
 
     my $headers_ref;
@@ -166,7 +170,9 @@ sub detect {
     return %detected;
 }
 
-=head2 my @cats = get_categories( )
+=head2 get_categories
+
+    my @cats = get_categories()
 
 Returns the array of all application categories.
 
@@ -181,9 +187,6 @@ sub get_categories {
 
 # Loads and processes clues from JSON file
 sub _load_categories {
-
-    # JSON file got from
-    # https://github.com/ElbertF/Wappalyzer/blob/master/share/apps.json
 
     open my $fh, '<', lib::abs::path( './apps.json' )
         or die 'Can not read clues file.';

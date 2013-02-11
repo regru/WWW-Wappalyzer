@@ -1,5 +1,10 @@
 Revision history for WWW-Wappalyzer
 
-0.01    Feb  2013 Alexander Nalobin
+0.01    8 Feb  2013 Alexander Nalobin
         First version, released on an unsuspecting world.
+
+0.02    11 Feb  2013 Alexander Nalobin
+        POD documentation fixes.
+        Replaced "defined or" operator.
+
 
