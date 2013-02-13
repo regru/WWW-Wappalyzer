@@ -7,4 +7,6 @@ Revision history for WWW-Wappalyzer
         POD documentation fixes.
         Replaced "defined or" operator.
 
-
+0.03    13 Feb  2013 Alexander Nalobin
+        Fixed "Unescaped left brace in regex is deprecated" in Perl 5.17.7.
+        GA regexp fix.

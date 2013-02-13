@@ -677,8 +677,8 @@
 		},
 		"Google Analytics": {
 			"cats": [ 10 ],
-			"html": "_gaq\\.push\\(\\[[\"']_setAccount",
-			"script": "(\\.google-analytics\\.com/ga\\.js|google-analytics\\.com/urchin\\.js)",
+			"html": "(_gaq\\.push\\(\\[[\"']_setAccount|google-analytics\\.com/ga\\.js)",
+			"script": "(google-analytics\\.com/ga\\.js|google-analytics\\.com/urchin\\.js)",
 			"headers": { "Set-Cookie": "__utma" },
 			"env": "^gaGlobal$"
 		},

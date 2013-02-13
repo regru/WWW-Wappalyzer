@@ -35,11 +35,11 @@ More info:  L<https://github.com/ElbertF/Wappalyzer/blob/master/README.md>
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 
 =head1 SYNOPSIS
@@ -234,8 +234,9 @@ sub _process_app_clues {
     # Precompile regexps
     for my $field ( @fields ) {
         my $re_ref = $app_ref->{$field};
-        my @re_list = !ref $re_ref ? $re_ref
-            : ref $re_ref eq 'ARRAY' ? @$re_ref : () ;
+        my @re_list =   !ref $re_ref ? $re_ref
+            : ref $re_ref eq 'ARRAY' ? ( map { _escape_re( $_ ) } @$re_ref )
+            : () ;
 
         if ( $field eq 'html' ) {
             push @html_re, map { qr/(?-x:$_)/ } @re_list;
@@ -255,7 +256,8 @@ sub _process_app_clues {
         elsif ( $field eq 'meta' ) {
             for my $key ( keys %$re_ref ) {
                 my $name_re = qr{ name \s* = \s* ["']? $key ["']? }x;
-                my $re = qr/$re_ref->{$key}/;
+                my $re = _escape_re( $re_ref->{$key} );
+                $re = qr/$re/;
                 my $content_re = qr{ content= ["'] (?-x:[^"']*$re[^"']*) ["'] }x;
 
                 push @html_re, qr/
@@ -269,7 +271,8 @@ sub _process_app_clues {
         }
         elsif ( $field eq 'headers' ) {
             for my $key ( keys %$re_ref ) {
-                $new_app_ref->{headers_re}{ lc $key } = qr/$re_ref->{$key}/;
+                my $re = _escape_re( $re_ref->{$key} );
+                $new_app_ref->{headers_re}{ lc $key } = qr/$re/;
             }
         }
     }
@@ -281,6 +284,16 @@ sub _process_app_clues {
     }
 
     return $new_app_ref;
+}
+
+# Escape special symbols in regexp string of config file
+sub _escape_re {
+    my ( $re ) = @_;
+    
+    # Escape { } braces
+    $re =~ s/ ([{}]) /[$1]/xig;
+
+    return $re;
 }
 
 =head1 AUTHOR
