@@ -10,3 +10,6 @@ Revision history for WWW-Wappalyzer
 0.03    13 Feb  2013 Alexander Nalobin
         Fixed "Unescaped left brace in regex is deprecated" in Perl 5.17.7.
         GA regexp fix.
+
+0.04    26 Feb  2013 Alexander Nalobin
+        Added add_clues_file() function.

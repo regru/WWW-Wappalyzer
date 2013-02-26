@@ -5,12 +5,13 @@ use strict;
 use warnings;
 
 use base qw ( Exporter );
-our @EXPORT_OK = qw( detect get_categories );
+our @EXPORT_OK = qw( detect get_categories add_clues_file );
 
 use lib::abs;
 use JSON qw();
 
 my %_categories;
+my @_clues_file_list = ( lib::abs::path( './apps.json' )  );
 
 # List of multi per web page application categories
 my %MULTIPLE_APP_CATS = map { $_ => 1 } qw( 
@@ -35,11 +36,11 @@ More info:  L<https://github.com/ElbertF/Wappalyzer/blob/master/README.md>
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 
 =head1 SYNOPSIS
@@ -179,46 +180,50 @@ Returns the array of all application categories.
 =cut
 
 sub get_categories {
-    # Lazy load and process clues from JSON file
+    # Lazy load and process clues from JSON files
     _load_categories() unless scalar keys %_categories;
 
     return keys %_categories;
 }
 
-# Loads and processes clues from JSON file
+# Loads and processes clues from JSON files
 sub _load_categories {
 
-    open my $fh, '<', lib::abs::path( './apps.json' )
-        or die 'Can not read clues file.';
+    for my $clue_file ( @_clues_file_list ) {
+        open my $fh, '<', $clue_file
+            or die "Can not read clues file $clue_file.";
 
-    local $/ = undef;
-    my $json = <$fh>;
-    close $fh;
+        local $/ = undef;
+        my $json = <$fh>;
+        close $fh;
 
-    # Do not support "Optional fields"
-    $json =~ s{ \\\\; (?: version | confidence ) [^"]+? " }{"}xig;
+        # Do not support "Optional fields"
+        $json =~ s{ \\\\; (?: version | confidence ) [^"]+? " }{"}xig;
 
-    my $cfg_ref = JSON::decode_json( $json );
+        my $cfg_ref = eval { JSON::decode_json( $json ) };
 
-    my $cats_ref = $cfg_ref->{categories}
-        or die 'Broken clues file. Can not find categories.';
+        die "Can't parse clue file $clue_file: $@" if $@;
 
-    my $apps_ref = $cfg_ref->{apps}
-        or die 'Broken clues file. Can not find applications.';
+        my $cats_ref = $cfg_ref->{categories}
+            or die "Broken clues file $clue_file. Can not find categories.";
 
-    # Process apps
-    while ( my ( $app, $app_ref ) = each %$apps_ref ) {
+        my $apps_ref = $cfg_ref->{apps}
+            or die "Broken clues file $clue_file. Can not find applications.";
 
-        my $new_app_ref = _process_app_clues( $app, $app_ref ) or next;
+        # Process apps
+        while ( my ( $app, $app_ref ) = each %$apps_ref ) {
 
-        my @cats = @{ $app_ref->{cats} } or next;
+            my $new_app_ref = _process_app_clues( $app, $app_ref ) or next;
 
-        $new_app_ref->{multi_cat} = 1 if @cats > 1;
+            my @cats = @{ $app_ref->{cats} } or next;
 
-        for my $cat_id ( @cats ) {
-            my $cat = $cats_ref->{ $cat_id } or next;
+            $new_app_ref->{multi_cat} = 1 if @cats > 1;
 
-            push @{ $_categories{ $cat } }, $new_app_ref;
+            for my $cat_id ( @cats ) {
+                my $cat = $cats_ref->{ $cat_id } or next;
+
+                push @{ $_categories{ $cat } }, $new_app_ref;
+            }
         }
     }
 }
@@ -294,6 +299,24 @@ sub _escape_re {
     $re =~ s/ ([{}]) /[$1]/xig;
 
     return $re;
+}
+
+=head2 add_clues_file
+
+    add_clues_file( $filepath )
+
+Puts additional clues file to a list of processed clues files.
+See apps.json as format sample.
+
+=cut
+
+sub add_clues_file {
+    my ( $filepath ) = @_;
+
+    push @_clues_file_list, $filepath;
+
+    # just clear out categories to lazy load later
+    %_categories = ();
 }
 
 =head1 AUTHOR

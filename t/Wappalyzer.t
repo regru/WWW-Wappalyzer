@@ -1,6 +1,7 @@
 #!perl -T
 
-use Test::More tests => 6;
+use FindBin qw($Bin);
+use Test::More tests => 8;
 
 BEGIN {
     use_ok( 'WWW::Wappalyzer' ) || print "Bail out!\n";
@@ -52,3 +53,18 @@ is_deeply \%detected, { blogs => [ 'LiveJournal' ] }, 'detect by url';
 );
 
 is_deeply \%detected, { 'web-servers' => [ 'Nginx' ] }, 'detect single cat';
+
+$html = q{
+var rls = {b1: {position: '1',use_from: '0',start: '0',end: '9',amount: '10',type: 'manual'}}</script><script type="text/javascript" language="JavaScript" src="http://img.sedoparking.com/jspartner/google.js"></script><script type="text/javascript" language="JavaScript">var ads_label = '<h2><span><a class="ad_sense_help" href="https://www.google.com/adsense/support/bin/request.py?
+};
+
+%detected = WWW::Wappalyzer::detect( html => $html );
+is_deeply \%detected, {}, 'detect before add clues file';
+
+WWW::Wappalyzer::add_clues_file( "$Bin/add.json" );
+
+%detected = WWW::Wappalyzer::detect(
+    html => $html,
+    headers  => { Server => 'nginx' },
+);
+is_deeply \%detected, { parkings => [ 'sedoparking' ], 'web-servers' => [ 'Nginx' ] }, 'detect after add clues file';
