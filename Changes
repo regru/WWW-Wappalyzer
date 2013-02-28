@@ -13,3 +13,7 @@ Revision history for WWW-Wappalyzer
 
 0.04    26 Feb  2013 Alexander Nalobin
         Added add_clues_file() function.
+
+0.05    28 Feb  2013 Alexander Nalobin
+        Fixed MANIFEST.
+
