@@ -36,11 +36,11 @@ More info:  L<https://github.com/ElbertF/Wappalyzer/blob/master/README.md>
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 
 =head1 SYNOPSIS
@@ -263,13 +263,13 @@ sub _process_app_clues {
                 my $name_re = qr{ name \s* = \s* ["']? $key ["']? }x;
                 my $re = _escape_re( $re_ref->{$key} );
                 $re = qr/$re/;
-                my $content_re = qr{ content= ["'] (?-x:[^"']*$re[^"']*) ["'] }x;
+                my $content_re = qr{ content \s* = \s* ["'] (?-x:[^"']*$re[^"']*) ["'] }x;
 
                 push @html_re, qr/
                     < \s* meta \s+
                     (?:
                           (?: $name_re    \s+ $content_re )
-                        | (?: $content_re \s+ $name_re    )
+                        # | (?: $content_re \s+ $name_re    ) # hangs sometimes
                     )
                 /x;
             }
