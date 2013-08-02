@@ -1,5 +1,8 @@
 Revision history for WWW-Wappalyzer
 
+0.07    02 Aug  2013 Alexander Nalobin
+        Updated json clues file from Wappalyzer github repo.
+
 0.06    02 Mar  2013 Alexander Nalobin
         Simplified meta tag matching.
 
