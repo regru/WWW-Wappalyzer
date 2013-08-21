@@ -1,7 +1,7 @@
 #!perl -T
 
 use FindBin qw($Bin);
-use Test::More tests => 8;
+use Test::More tests => 9;
 
 BEGIN {
     use_ok( 'WWW::Wappalyzer' ) || print "Bail out!\n";
@@ -51,8 +51,13 @@ is_deeply \%detected, { blogs => [ 'LiveJournal' ] }, 'detect by url';
     headers  => { Server => 'nginx' },
     cats => [ 'web-servers' ],
 );
-
 is_deeply \%detected, { 'web-servers' => [ 'Nginx' ] }, 'detect single cat';
+
+%detected = WWW::Wappalyzer::detect(
+    html => q{<link href="./dist/css/bootstrap.css" rel="stylesheet">},
+    cats => [ 'web-frameworks' ],
+);
+is_deeply \%detected, { 'web-frameworks' => [ 'Twitter Bootstrap' ] }, 're with html entity';
 
 $html = q{
 var rls = {b1: {position: '1',use_from: '0',start: '0',end: '9',amount: '10',type: 'manual'}}</script><script type="text/javascript" language="JavaScript" src="http://img.sedoparking.com/jspartner/google.js"></script><script type="text/javascript" language="JavaScript">var ads_label = '<h2><span><a class="ad_sense_help" href="https://www.google.com/adsense/support/bin/request.py?

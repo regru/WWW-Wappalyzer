@@ -36,11 +36,11 @@ More info:  L<https://github.com/ElbertF/Wappalyzer/blob/master/README.md>
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 
 =head1 SYNOPSIS
@@ -199,6 +199,10 @@ sub _load_categories {
 
         # Do not support "Optional fields"
         $json =~ s{ \\\\; (?: version | confidence ) [^"]+? " }{"}xig;
+
+        # Replace html entities with oridinary symbols
+        $json =~ s{&gt;}{>}xig;
+        $json =~ s{&lt;}{<}xig;
 
         my $cfg_ref = eval { JSON::decode_json( $json ) };
 
