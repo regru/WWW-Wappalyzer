@@ -1,5 +1,8 @@
 Revision history for WWW-Wappalyzer
 
+0.09    23 Aug  2013 Alexander Nalobin
+        Fixed bug in test.
+
 0.08    21 Aug  2013 Alexander Nalobin
         Fixed bug with new clues file html entity encoding.
 

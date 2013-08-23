@@ -25,7 +25,6 @@ my $html = q{<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "htt
   <link href="/index.php?format=feed&amp;type=atom" rel="alternate" type="application/atom+xml" title="Atom 1.0" />
   <link href="/templates/rhuk_milkyway/favicon.ico" rel="shortcut icon" type="image/x-icon" />
   <script type="text/javascript" src="/media/system/js/jquery.1.5.4.js"></script>
-  <script type="text/javascript" src="/media/system/js/mootools.js"></script>
   <script type="text/javascript" src="/media/system/js/caption.js"></script>};
 
 my %detected = WWW::Wappalyzer::detect(
@@ -39,7 +38,7 @@ my %detected = WWW::Wappalyzer::detect(
 is_deeply \%detected, {
     'web-servers' => [ 'Nginx' ],
     cms => [ 'Joomla' ],
-    'javascript-frameworks' => [ 'jQuery', 'MooTools' ],
+    'javascript-frameworks' => [ 'jQuery' ],
     'hosting-panels' => [ 'Plesk' ],
 }, 'detect by html & headers';
 
