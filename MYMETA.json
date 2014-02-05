@@ -4,7 +4,7 @@
       "Alexander Nalobin <alexander@nalobin.ru>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.112621",
+   "generated_by" : "ExtUtils::MakeMaker version 6.78, CPAN::Meta::Converter version 2.120351",
    "license" : [
       "perl_5"
    ],
@@ -22,23 +22,23 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : 0
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : 0
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "Exporter" : 0,
-            "JSON" : 0,
-            "Test::More" : 0,
-            "lib::abs" : 0
+            "Exporter" : "0",
+            "JSON" : "0",
+            "Test::More" : "0",
+            "lib::abs" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.09"
+   "version" : "0.10"
 }

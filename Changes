@@ -1,5 +1,8 @@
 Revision history for WWW-Wappalyzer
 
+0.10    04 Feb  2014 Alexander Nalobin
+        MODx CMS detection fix.
+
 0.09    23 Aug  2013 Alexander Nalobin
         Fixed bug in test.
 

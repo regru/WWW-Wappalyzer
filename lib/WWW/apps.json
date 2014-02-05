@@ -1621,7 +1621,7 @@
 		"MODx": {
 			"website": "modxcms.com",
 			"cats": [ 1 ],
-			"html": "(?:&lt;a[^&gt;]+&gt;Powered by MODx&lt;/a&gt;|&lt;(?:link|script)[^&gt;]+assets/snippets/)",
+			"html": "(?:&lt;a[^&gt;]+&gt;Powered by MODx&lt;/a&gt;|&lt;(?:link|script|img)[^&gt;]+assets/(snippets|components|templates|cache)/)",
 			"env": "^MODX_MEDIA_PATH$",
 			"headers": { "X-Powered-By": "^MODx", "Set-Cookie": "SN4[a-f\\d]{12}" },
 			"implies": "PHP"
