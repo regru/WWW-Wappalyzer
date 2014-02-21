@@ -991,7 +991,7 @@
 		"Google Analytics": {
 			"website": "google.com/analytics",
 			"cats": [ 10 ],
-			"html": "_gaq\\.push\\(\\['_setAccount",
+			"html": "(_gaq\\.push\\(\\['_setAccount)|([.]google-analytics[.]com/ga[.]js)|(stats[.]g[.]doubleclick[.]net/dc[.]js)",
 			"script": "(?:\\.google-analytics\\.com/ga\\.js|google-analytics\\.com/urchin\\.js)",
 			"headers": { "Set-Cookie": "__utma" },
 			"env": "^gaGlobal$"
@@ -2888,7 +2888,7 @@
 		"Yandex.Metrika": {
 			"website": "metrika.yandex.com",
 			"cats": [ 10 ],
-			"script": "mc\\.yandex\\.ru/metrika/watch\\.js"
+			"html": "(mc\\.yandex\\.ru/metrika/watch\\.js)|(<img src=\"//mc.yandex.ru/watch/)"
 		},
 		"YouTube": {
 			"website": "www.youtube.com",
