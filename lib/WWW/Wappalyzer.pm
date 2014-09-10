@@ -32,15 +32,15 @@ Lacks 'version' and 'confidence' support of original Wappalyzer in favour of spe
 
 Clues:      L<https://github.com/ElbertF/Wappalyzer/blob/master/share/apps.json>
 
-More info:  L<https://github.com/ElbertF/Wappalyzer/blob/master/README.md>
+More info on Wappalyzer:  L<https://github.com/ElbertF/Wappalyzer/blob/master/README.md>
 
 =head1 VERSION
 
-Version 0.13
+Version 0.14
 
 =cut
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 
 =head1 SYNOPSIS
@@ -351,6 +351,10 @@ You can also look for information at:
 
 =over 4
 
+=item * GitHub
+
+L<https://github.com/nalobin/WWW-Wappalyzer>
+
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-Wappalyzer>
@@ -375,7 +379,7 @@ L<http://search.cpan.org/dist/WWW-Wappalyzer/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013 Alexander Nalobin.
+Copyright 2013-2014 Alexander Nalobin.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
