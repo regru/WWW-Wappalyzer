@@ -16,7 +16,7 @@ my @_clues_file_list = ( lib::abs::path( './apps.json' )  );
 # List of multi per web page application categories
 my %MULTIPLE_APP_CATS = map { $_ => 1 } qw( 
     widgets analytics javascript-frameworks video-players
-    font-scripts miscellaneous advertizing-networks payment-processors
+    font-scripts miscellaneous advertising-networks payment-processors
 );
 
 =head1 NAME
@@ -40,7 +40,7 @@ Version 0.14
 
 =cut
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 
 =head1 SYNOPSIS
