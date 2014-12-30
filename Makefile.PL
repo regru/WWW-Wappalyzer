@@ -20,4 +20,14 @@ WriteMakefile(
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'WWW-Wappalyzer-*' },
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+         resources => {
+             repository => {
+                 type => 'git',
+                 url  => 'https://github.com/nalobin/Date-Holidays-RU.git',
+                 web  => 'https://github.com/nalobin/Date-Holidays-RU',
+             },
+         },
+    },
 );

@@ -21,7 +21,7 @@ my %MULTIPLE_APP_CATS = map { $_ => 1 } qw(
 
 =head1 NAME
 
-WWW::Wappalyzer - Perl port of Wappalyzer (L<http://wappalyzer.com>)
+WWW::Wappalyzer - Perl port of Wappalyzer (http://wappalyzer.com)
 
 =head1 DESCRIPTION
 
