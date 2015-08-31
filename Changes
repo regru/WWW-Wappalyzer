@@ -1,5 +1,8 @@
 Revision history for WWW-Wappalyzer
 
+0.16    31 Aug 2015 Alexander Nalobin
+        Updated JSON clues file from Wappalyzer github repo.
+
 0.15    17 Oct 2014 Alexander Nalobin
         Fixed 'advertizing-networks' value in a list of multi-app categories.
 

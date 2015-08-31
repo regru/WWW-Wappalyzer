@@ -30,17 +30,17 @@ web servers, JavaScript frameworks, analytics tools and many more.
 
 Lacks 'version' and 'confidence' support of original Wappalyzer in favour of speed.
 
-Clues:      L<https://github.com/ElbertF/Wappalyzer/blob/master/share/apps.json>
+Clues:      L<https://github.com/AliasIO/Wappalyzer/blob/master/src/apps.json>
 
-More info on Wappalyzer:  L<https://github.com/ElbertF/Wappalyzer/blob/master/README.md>
+More info on Wappalyzer:  L<https://github.com/AliasIO/Wappalyzer>
 
 =head1 VERSION
 
-Version 0.14
+Version 0.16
 
 =cut
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 
 =head1 SYNOPSIS
@@ -379,7 +379,7 @@ L<http://search.cpan.org/dist/WWW-Wappalyzer/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013-2014 Alexander Nalobin.
+Copyright 2013-2015 Alexander Nalobin.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
