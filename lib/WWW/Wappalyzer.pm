@@ -40,7 +40,7 @@ Version 0.16
 
 =cut
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 
 =head1 SYNOPSIS
@@ -300,14 +300,17 @@ sub _escape_re {
     my ( $re ) = @_;
     
     # Escape { } braces
-    $re =~ s/ ([{}]) /[$1]/xig;
+    $re =~ s/ ([{}]) /\$1/xig;
 
     # Escape [^]
     $re =~ s{\Q[^]\E}{[\\^]}ig;
 
     # Escape \\1
     $re =~ s{\Q\1\E}{\\\\1}ig;
-   
+
+    # Escape (?!
+    $re =~ s{[(][?][!]}{([?]!}ig; 
+ 
     return $re;
 }
 

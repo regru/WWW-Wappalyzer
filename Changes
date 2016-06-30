@@ -1,5 +1,9 @@
 Revision history for WWW-Wappalyzer
 
+0.17    30 Jun 2016 Alexander Nalobin
+        Updated JSON clues file from Wappalyzer github repo.
+        Fixes Perl 5.25.1 RE compile error (https://rt.cpan.org/Ticket/Display.html?id=115663)
+
 0.16    31 Aug 2015 Alexander Nalobin
         Updated JSON clues file from Wappalyzer github repo.
 
