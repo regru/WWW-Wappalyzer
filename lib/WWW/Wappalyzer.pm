@@ -34,14 +34,9 @@ Clues:      L<https://github.com/AliasIO/Wappalyzer/blob/master/src/apps.json>
 
 More info on Wappalyzer:  L<https://github.com/AliasIO/Wappalyzer>
 
-=head1 VERSION
-
-Version 0.16
-
 =cut
 
-our $VERSION = '0.17';
-
+our $VERSION = '0.18';
 
 =head1 SYNOPSIS
 
@@ -300,7 +295,7 @@ sub _escape_re {
     my ( $re ) = @_;
     
     # Escape { } braces
-    $re =~ s/ ([{}]) /\$1/xig;
+    $re =~ s/ ([{}]) /\\$1/xig;
 
     # Escape [^]
     $re =~ s{\Q[^]\E}{[\\^]}ig;

@@ -25,8 +25,8 @@ WriteMakefile(
          resources => {
              repository => {
                  type => 'git',
-                 url  => 'https://github.com/nalobin/Date-Holidays-RU.git',
-                 web  => 'https://github.com/nalobin/Date-Holidays-RU',
+                 url  => 'https://github.com/nalobin/WWW-Wappalyzer.git',
+                 web  => 'https://github.com/nalobin/WWW-Wappalyzer',
              },
          },
     },
