@@ -295,7 +295,7 @@ sub _escape_re {
     my ( $re ) = @_;
     
     # Escape { } braces
-    $re =~ s/ ([{}]) /\\$1/xig;
+    #$re =~ s/ ([{}]) /[$1]/xig;
 
     # Escape [^]
     $re =~ s{\Q[^]\E}{[\\^]}ig;

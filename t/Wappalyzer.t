@@ -1,7 +1,7 @@
 #!perl -T
 
 use FindBin qw($Bin);
-use Test::More tests => 9;
+use Test::More tests => 10;
 
 BEGIN {
     use_ok( 'WWW::Wappalyzer' ) || print "Bail out!\n";
@@ -72,3 +72,9 @@ WWW::Wappalyzer::add_clues_file( "$Bin/add.json" );
     headers  => { Server => 'nginx' },
 );
 is_deeply \%detected, { parkings => [ 'sedoparking' ], 'web-servers' => [ 'Nginx' ] }, 'detect after add clues file';
+
+%detected = WWW::Wappalyzer::detect(
+    html => 'aaa { bbb',
+);
+is_deeply \%detected, { parkings => [ 'open_curly_bracket' ] }, 'detect open curly bracket';
+
