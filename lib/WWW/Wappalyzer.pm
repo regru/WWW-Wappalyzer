@@ -36,7 +36,7 @@ More info on Wappalyzer:  L<https://github.com/AliasIO/Wappalyzer>
 
 =cut
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 =head1 SYNOPSIS
 
