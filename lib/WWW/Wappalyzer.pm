@@ -343,7 +343,7 @@ sub _escape_re {
 sub _optimize_rules {
     my ( $rules ) = @_;
     
-    if ( @$rules == grep { $_->{confidence} == 100 } @$rules ) {
+    if ( @$rules > 1 && @$rules == grep { $_->{confidence} == 100 } @$rules ) {
         # can combine only if confidence for each is 100
         my $re = join '|', map { $_->{re} } @$rules;
         return [{
