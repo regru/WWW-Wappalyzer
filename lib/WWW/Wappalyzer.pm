@@ -28,7 +28,7 @@ WWW::Wappalyzer - Perl port of Wappalyzer (http://wappalyzer.com)
 Uncovers the technologies used on websites: detects content management systems, web shops,
 web servers, JavaScript frameworks, analytics tools and many more.
 
-Lacks 'version' and 'confidence' support of original Wappalyzer in favour of speed.
+Lacks 'version', 'implies', 'excludes' support of original Wappalyzer in favour of speed.
 
 Clues:      L<https://github.com/AliasIO/Wappalyzer/blob/master/src/apps.json>
 
@@ -123,27 +123,38 @@ sub detect {
             }
             else {
                 # Try regexes...
+                my $confidence = 0;
 
-                if ( defined $headers_ref && exists $app_ref->{headers_re} ) {
-                    my %headers_re = %{ $app_ref->{headers_re} };
-                    while ( my ( $header, $re ) = each %headers_re ) {
+                if ( defined $headers_ref && exists $app_ref->{headers_rules} ) {
+                    my %headers_rules = %{ $app_ref->{headers_rules} };
+                    while ( my ( $header, $rule ) = each %headers_rules ) {
                         my $header_val = $headers_ref->{ $header } or next;
 
-                        if ( $header_val =~ m{$re}ims ) {
-                            $detected = 1;
-                            last;
+                        if ( $header_val =~ m/$rule->{re}/ ) {
+                            $confidence += $rule->{confidence};
+                            if ( $confidence >= 100 ) {
+                                $detected = 1;
+                                last;
+                            }
                         }
                     }
                 }
 
                 unless ( $detected ) {
                     # try from most to least relevant method
-                    for my $re_type ( qw( html url ) ) {
-                        if ( defined $params{ $re_type } && exists $app_ref->{ $re_type. '_re' }
-                            && $params{ $re_type } =~ m{$app_ref->{ $re_type. '_re' }}ims
-                        ) {
-                            $detected = 1;
-                            last;
+                    RULES:
+                    for my $rule_type ( qw( html url ) ) {
+                        my $rule_name = $rule_type. '_rules';
+                        if ( defined $params{ $rule_type } && exists $app_ref->{ $rule_name } ) {
+                            for my $rule ( @{ $app_ref->{ $rule_name } } ) {
+                                if ( $params{ $rule_type } =~ m/$rule->{re}/ ) {
+                                    $confidence += $rule->{confidence};
+                                    if ( $confidence >= 100 ) {
+                                        $detected = 1;
+                                        last RULES;
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -192,9 +203,6 @@ sub _load_categories {
         my $json = <$fh>;
         close $fh;
 
-        # Do not support "Optional fields"
-        $json =~ s{ \\\\; (?: version | confidence ) [^"]+? " }{"}xig;
-
         # Replace html entities with oridinary symbols
         $json =~ s{&gt;}{>}xig;
         $json =~ s{&lt;}{<}xig;
@@ -234,60 +242,82 @@ sub _process_app_clues {
     my $new_app_ref = { name => $app };
 
     my @fields = grep { exists $app_ref->{$_} } qw( script html meta headers url );
-    my @html_re;
+    my @html_rules;
     # Precompile regexps
     for my $field ( @fields ) {
-        my $re_ref = $app_ref->{ $field };
-        my @re_list =   !ref $re_ref ? _escape_re( $re_ref )
-            : ref $re_ref eq 'ARRAY' ? ( map { _escape_re( $_ ) } @$re_ref )
+        my $rule_ref = $app_ref->{ $field };
+        my @rules_list =   !ref $rule_ref ? _parse_rule( $rule_ref )
+            : ref $rule_ref eq 'ARRAY' ? ( map { _parse_rule( $_ ) } @$rule_ref )
             : () ;
 
         if ( $field eq 'html' ) {
-            push @html_re, map { qr/(?-x:$_)/ } @re_list;
+            push @html_rules, map { $_->{re} = qr/(?-x:$_->{re})/ims; $_ } @rules_list;
         }
         elsif ( $field eq 'script' ) {
-            push @html_re,
+            push @html_rules,
                 map {
-                    qr/
-                        < \s* script [^>]+ src \s* = \s* ["'] (?-x:[^"']*$_[^"']*) ["']
-                    /x
-                } @re_list;
+                    $_->{re} = qr/
+                        < \s* script [^>]+ src \s* = \s* ["'] [^"']* (?-x:$_->{re}) [^"']* ["']
+                    /xims;
+                    $_
+                } @rules_list;
         }
         elsif ( $field eq 'url' ) {
-            $new_app_ref->{url_re} = join ' | ', map { qr/(?-x:$_)/ } @re_list;
-            $new_app_ref->{url_re} = qr/$new_app_ref->{url_re}/x;
+            my @url_rules = map { $_->{re} = qr/(?-x:$_->{re})/ims; $_ } @rules_list;
+            $new_app_ref->{url_rules} = _optimize_rules( \@url_rules );
         }
         elsif ( $field eq 'meta' ) {
-            for my $key ( keys %$re_ref ) {
-                my $name_re = qr{ name \s* = \s* ["']? $key ["']? }x;
-                my $re = _escape_re( $re_ref->{$key} );
-                $re = qr/$re/;
-                my $content_re = qr{ content \s* = \s* ["'] (?-x:[^"']*$re[^"']*) ["'] }x;
+            for my $key ( keys %$rule_ref ) {
+                my $name_re = qr/ name \s* = \s* ["']? $key ["']? /xims;
+                my $rule = _parse_rule( $rule_ref->{$key} );
+                $rule->{re} = qr/$rule->{re}/ims;
+                my $content_re = qr/ content \s* = \s* ["'] [^"']* (?-x:$rule->{re}) [^"']* ["'] /xims;
 
-                push @html_re, qr/
+                $rule->{re} = qr/
                     < \s* meta \s+
                     (?:
                           (?: $name_re    \s+ $content_re )
                         # | (?: $content_re \s+ $name_re    ) # hangs sometimes
                     )
-                /x;
+                /xims;
+                
+                push @html_rules, $rule;
             }
         }
         elsif ( $field eq 'headers' ) {
-            for my $key ( keys %$re_ref ) {
-                my $re = _escape_re( $re_ref->{$key} );
-                $new_app_ref->{headers_re}{ lc $key } = qr/$re/;
+            for my $key ( keys %$rule_ref ) {
+                my $rule = _parse_rule( $rule_ref->{$key} );
+                $rule->{re} = qr/$rule->{re}/ims;
+                $new_app_ref->{headers_rules}{ lc $key } = $rule;
             }
         }
     }
 
-    if ( @html_re ) {
-        # Clue all html regexps into one regexp
-        $new_app_ref->{html_re} = join ' | ', map { "(?: $_ )" } @html_re;
-        $new_app_ref->{html_re} = qr/$new_app_ref->{html_re}/x;
+    if ( @html_rules ) {
+        $new_app_ref->{html_rules} = _optimize_rules( \@html_rules );
     }
 
     return $new_app_ref;
+}
+
+# separate regexp and other optional parameters from the rule
+sub _parse_rule {
+    my ( $rule ) = @_;
+    
+    my ( $re, @params ) = split /\\;/, $rule;
+    
+    my $confidence;
+    for my $param ( @params ) {
+        if ( ( $confidence ) = $param =~ /^\s*confidence\s*:\s*(\d+)\s*$/ ) {
+            # supports only confidence for now
+            last;
+        }
+    }
+    
+    return {
+        re         => _escape_re( defined( $re ) ? $re : '' ),
+        confidence => $confidence || 100,
+    };
 }
 
 # Escape special symbols in regexp string of config file
@@ -307,6 +337,22 @@ sub _escape_re {
     $re =~ s{[(][?][!]}{([?]!}ig; 
  
     return $re;
+}
+
+# If possible combine all rules in one regexp
+sub _optimize_rules {
+    my ( $rules ) = @_;
+    
+    if ( @$rules == grep { $_->{confidence} == 100 } @$rules ) {
+        # can combine only if confidence for each is 100
+        my $re = join '|', map { $_->{re} } @$rules;
+        return [{
+           re         => qr/$re/,
+           confidence => 100,
+        }];
+    }
+    
+    return $rules;
 }
 
 =head2 add_clues_file
