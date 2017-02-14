@@ -1,5 +1,8 @@
 Revision history for WWW-Wappalyzer
 
+0.19    14 Feb 2017 Oleg Gavrin
+        Added "confidence" option support
+
 0.18    16 Jul 2016 Alexander Nalobin
         Bugfix for 0.17
 

@@ -1,7 +1,8 @@
-#!perl -T
+#!perl
 
+use utf8;
 use FindBin qw($Bin);
-use Test::More tests => 10;
+use Test::More tests => 12;
 
 BEGIN {
     use_ok( 'WWW::Wappalyzer' ) || print "Bail out!\n";
@@ -59,7 +60,10 @@ is_deeply \%detected, { 'web-servers' => [ 'Nginx' ] }, 'detect single cat';
 is_deeply \%detected, { 'web-frameworks' => [ 'Twitter Bootstrap' ] }, 're with html entity';
 
 $html = q{
-var rls = {b1: {position: '1',use_from: '0',start: '0',end: '9',amount: '10',type: 'manual'}}</script><script type="text/javascript" language="JavaScript" src="http://img.sedoparking.com/jspartner/google.js"></script><script type="text/javascript" language="JavaScript">var ads_label = '<h2><span><a class="ad_sense_help" href="https://www.google.com/adsense/support/bin/request.py?
+var rls = {b1: {position: '1',use_from: '0',start: '0',end: '9',amount: '10',type: 'manual'}}</script>
+<script type="text/javascript" language="JavaScript" src="http://img.sedoparking.com/jspartner/google.js"></script>
+<script type="text/javascript" language="JavaScript">var ads_label = '<h2><span>
+<a class="ad_sense_help" href="https://www.google.com/adsense/support/bin/request.py?
 };
 
 %detected = WWW::Wappalyzer::detect( html => $html );
@@ -78,3 +82,32 @@ is_deeply \%detected, { parkings => [ 'sedoparking' ], 'web-servers' => [ 'Nginx
 );
 is_deeply \%detected, { parkings => [ 'open_curly_bracket' ] }, 'detect open curly bracket';
 
+$html = q{
+<!doctype html>
+<HTML>
+<HEAD>
+<META name="robots" content="index,follow">
+<META http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<TITLE>SALVADOR регистрация доменов RU,COM,NET,ORG,etc,...</TITLE>
+};
+
+%detected = WWW::Wappalyzer::detect(
+    html => $html,
+    headers  => { Server => 'nginx' },
+);
+is_deeply \%detected, { 'web-servers' => [ 'Nginx' ] }, 'detect parking with confidence, 50% found';
+
+$html .= q{
+    <meta http-equiv="Content-Language" Content="ru">
+<meta name="copyright" Content="1'st Domain Name Service">
+<meta name="revisit-after" Content="7 days">
+<LINK href="style.css" rel="stylesheet" type="text/css">
+<LINK REL="SHORTCUT ICON" href="/favicon.ico">
+};
+
+%detected = WWW::Wappalyzer::detect(
+    html => $html,
+    headers  => { Server => 'nginx' },
+);
+is_deeply \%detected, { parkings => [ '1reg.online' ], 'web-servers' => [ 'Nginx' ] }, 'detect parking with confidence, 100% found';
