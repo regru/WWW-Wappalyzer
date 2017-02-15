@@ -9,6 +9,7 @@ our @EXPORT_OK = qw( detect get_categories add_clues_file );
 
 use lib::abs;
 use JSON qw();
+use Regexp::Parser;
 
 my %_categories;
 my @_clues_file_list = ( lib::abs::path( './apps.json' )  );
@@ -90,6 +91,20 @@ sub detect {
     my %params = @_;
 
     return () unless $params{html} || $params{headers} || $params{url};
+    
+    # search will be case insensitive
+    if ( $params{html} ) {
+        $params{html} = lc $params{html};
+    }
+    if ( $params{url} ) {
+        $params{url} = lc $params{url};
+    }
+    if ( $params{headers} ) {
+        # do not modify orig headers
+        my %tmp;
+        $tmp{$_} = lc $params{headers}{$_} for keys %{ $params{headers} };
+        $params{headers} = \%tmp;
+    }
 
     # Lazy load and process clues from JSON file
     _load_categories() unless scalar keys %_categories;
@@ -251,27 +266,28 @@ sub _process_app_clues {
             : () ;
 
         if ( $field eq 'html' ) {
-            push @html_rules, map { $_->{re} = qr/(?-x:$_->{re})/ims; $_ } @rules_list;
+            push @html_rules, map { $_->{re} = qr/(?-x:$_->{re})/; $_ } @rules_list;
         }
         elsif ( $field eq 'script' ) {
             push @html_rules,
                 map {
                     $_->{re} = qr/
                         < \s* script [^>]+ src \s* = \s* ["'] [^"']* (?-x:$_->{re}) [^"']* ["']
-                    /xims;
+                    /x;
                     $_
                 } @rules_list;
         }
         elsif ( $field eq 'url' ) {
-            my @url_rules = map { $_->{re} = qr/(?-x:$_->{re})/ims; $_ } @rules_list;
+            my @url_rules = map { $_->{re} = qr/(?-x:$_->{re})/; $_ } @rules_list;
             $new_app_ref->{url_rules} = _optimize_rules( \@url_rules );
         }
         elsif ( $field eq 'meta' ) {
             for my $key ( keys %$rule_ref ) {
-                my $name_re = qr/ name \s* = \s* ["']? $key ["']? /xims;
+                my $lc_key = lc $key;
+                my $name_re = qr/ name \s* = \s* ["']? $lc_key ["']? /x;
                 my $rule = _parse_rule( $rule_ref->{$key} );
-                $rule->{re} = qr/$rule->{re}/ims;
-                my $content_re = qr/ content \s* = \s* ["'] [^"']* (?-x:$rule->{re}) [^"']* ["'] /xims;
+                $rule->{re} = qr/$rule->{re}/;
+                my $content_re = qr/ content \s* = \s* ["'] [^"']* (?-x:$rule->{re}) [^"']* ["'] /x;
 
                 $rule->{re} = qr/
                     < \s* meta \s+
@@ -279,7 +295,7 @@ sub _process_app_clues {
                           (?: $name_re    \s+ $content_re )
                         # | (?: $content_re \s+ $name_re    ) # hangs sometimes
                     )
-                /xims;
+                /x;
                 
                 push @html_rules, $rule;
             }
@@ -287,7 +303,7 @@ sub _process_app_clues {
         elsif ( $field eq 'headers' ) {
             for my $key ( keys %$rule_ref ) {
                 my $rule = _parse_rule( $rule_ref->{$key} );
-                $rule->{re} = qr/$rule->{re}/ims;
+                $rule->{re} = qr/$rule->{re}/;
                 $new_app_ref->{headers_rules}{ lc $key } = $rule;
             }
         }
@@ -334,7 +350,27 @@ sub _escape_re {
     $re =~ s{\Q\1\E}{\\\\1}ig;
 
     # Escape (?!
-    $re =~ s{[(][?][!]}{([?]!}ig; 
+    $re =~ s{[(][?][!]}{([?]!}ig;
+    
+    # turn literals in regexp to lowercase to make case insensitive search
+    # i flag will be slower because we makes many searches in one text
+    no warnings 'redefine';
+    local *Regexp::Parser::warn = sub {}; # it may be too noisy
+    
+    my $parser = Regexp::Parser->new();
+    if ( $parser->regex($re) ) {
+        $re = '';
+        
+        while ( my $node = $parser->next ) {
+            my $ref = ref $node;
+            if ( $ref eq 'Regexp::Parser::exact' || $ref eq 'Regexp::Parser::anyof_char' ) {
+                $re .= lc $node->raw;
+            }
+            else {
+                $re .= $node->raw;
+            }
+        }
+    }
  
     return $re;
 }
