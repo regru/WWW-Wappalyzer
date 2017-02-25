@@ -1,5 +1,8 @@
 Revision history for WWW-Wappalyzer
 
+0.20    25 Feb 2017 Oleg Gavrin
+        Make detect() faster and still case insensitive
+
 0.19    14 Feb 2017 Oleg Gavrin
         Added "confidence" option support
 
